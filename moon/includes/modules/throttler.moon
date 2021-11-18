@@ -38,39 +38,49 @@ Throttler._getId = =>
 --     Function to decide if throttling logic should be skipped (return true to skip)
 --
 --   adjust
---     Function, return a table with any of the following keys: ["delay", "budget", "refillRate"] to override the initial settings for this execution
+--     Function, return a table with any of the following keys: ["delay", "budget", "refillRate", "id"] to override the initial settings for this execution
 
-Throttler.build = (func=@_noop, struct={}) =>
-    Merge {
+Throttler._build = () =>
+    {
         id: @_getId!
         context: self
         delay: 1
         budget: 1
         refillRate: 1
-        success: func
+        success: @_noop
         failure: @_noop
         shouldSkip: @_noop
         adjust: nil
-    }, struct
+    }
 
 
-Throttler.create = (throttleStruct=@build!) =>
+Throttler.create = (func, throttleStruct=@build!) =>
     {
         :id, :context, :delay, :budget, :refillRate,
         :success, :failure, :shouldSkip, :adjust
-    } = throttleStruct
+    } = Merge @_build!, throttleStruct
+
+    baseId = id
 
     (...) ->
         args = {...}
-        succeed = -> success unpack args
+
+        succeed = ->
+            shouldRun = success unpack args
+            return if shouldRun == false
+
+            func unpack args
+
         fail = -> failure unpack args
 
         return succeed! if shouldSkip(unpack args) == true
 
         -- Perform adjustments
+        -- TODO: Work out how to only do these adjustments when necessary
         if adjust
             adjustments = adjust unpack args
 
+            id = adjustments.id and adjustments.id( baseId ) or id
             delay = adjustments.delay or delay
             budget = adjustments.budget or budget
             refillRate = adjustments.refillRate or refillRate
