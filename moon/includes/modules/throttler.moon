@@ -1,6 +1,6 @@
 import min from math
 import Merge from table
-import unpack, isentity, istable, CurTime from _G
+import unpack, isfunction, CurTime from _G
 
 export Throttler = {}
 
@@ -86,7 +86,7 @@ Throttler.create = (func, throttleStruct=@build!) =>
             refillRate = adjustments.refillRate or refillRate
 
         -- If context is a table/entity, use it, otherwise call it as a function with the given params
-        context = not isfunction(context) and context or context unpack args
+        context = isfunction(context) and context(unpack args) or context
 
         context._Throttles or= {}
         context._Throttles[id] or= {
@@ -103,15 +103,13 @@ Throttler.create = (func, throttleStruct=@build!) =>
         throttle.budget = min throttle.budget + refillAmount, budget
 
         -- Has budget, can use
-        if throttle.budget > 0
+        if throttle.budget >= 1
             throttle.budget -= 1
             throttle.lastUse = now
             return succeed!
 
         -- Blocked by delay
-        if sinceLastUse < delay
-            fail!
-            return false
+        return fail! if sinceLastUse < delay
 
         -- No budget, but has waited long enough since the last use
         throttle.lastUse = now
