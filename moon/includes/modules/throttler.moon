@@ -40,7 +40,7 @@ Throttler._getId = =>
 --   adjust
 --     Function, return a table with any of the following keys: ["delay", "budget", "refillRate", "id"] to override the initial settings for this execution
 
-Throttler._build = () =>
+Throttler.build = () =>
     {
         id: @_getId!
         context: self
@@ -58,7 +58,7 @@ Throttler.create = (func, throttleStruct=@build!) =>
     {
         :id, :context, :delay, :budget, :refillRate,
         :success, :failure, :shouldSkip, :adjust
-    } = Merge @_build!, throttleStruct
+    } = Merge @build!, throttleStruct
 
     baseId = id
 
