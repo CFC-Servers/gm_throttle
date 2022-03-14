@@ -6,8 +6,6 @@ require( "throttler" )
 -- Ambient sounds also won't be throttled.
 --
 local function throttleEmitSound()
-    local entityMeta = FindMetaTable( "Entity" )
-    local emitSound = entityMeta.EmitSound
 
     local throttle = {
         delay = 1,
@@ -49,5 +47,7 @@ local function throttleEmitSound()
         end
     }
 
-    entityMeta.EmitSound = Throttler.create( emitSound, throttle )
+    local entityMeta = FindMetaTable( "Entity" )
+    entityMeta._EmitSound = entityMeta._EmitSound or entityMeta.EmitSound
+    entityMeta.EmitSound = Throttler.create( entityMeta._EmitSound, throttle )
 end

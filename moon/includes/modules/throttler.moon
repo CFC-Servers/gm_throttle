@@ -43,7 +43,7 @@ Throttler._getId = =>
 Throttler.build = () =>
     {
         id: @_getId!
-        context: self
+        context: @_getself
         delay: 1
         budget: 1
         refillRate: 1
@@ -54,7 +54,8 @@ Throttler.build = () =>
     }
 
 
-Throttler.create = (func, throttleStruct=@build!) =>
+Throttler.throttles = {}
+Throttler.create = (func, throttleStruct={}) =>
     {
         :id, :context, :delay, :budget, :refillRate,
         :success, :failure, :shouldSkip, :adjust
@@ -62,7 +63,7 @@ Throttler.create = (func, throttleStruct=@build!) =>
 
     baseId = id
 
-    (...) ->
+    throttledFunc = (...) ->
         args = {...}
 
         succeed = ->
@@ -79,38 +80,54 @@ Throttler.create = (func, throttleStruct=@build!) =>
         -- TODO: Work out how to only do these adjustments when necessary
         if adjust
             adjustments = adjust unpack args
+            adjustmentId = rawget(adjustments, "id")
+            adjustmentId and= adjustmentId(baseId)
 
-            id = adjustments.id and adjustments.id( baseId ) or id
-            delay = adjustments.delay or delay
-            budget = adjustments.budget or budget
-            refillRate = adjustments.refillRate or refillRate
+            id = adjustmentId if adjustmentId
+            delay = rawget(adjustments, "delay") or delay
+            budget = rawget(adjustments, "budget") or budget
+            refillRate = rawget(adjustments, "refillRate") or refillRate
 
-        -- If context is a table/entity, use it, otherwise call it as a function with the given params
+        -- If context is a function, call it with the given params, otherwise use it as a table
         context = isfunction(context) and context(unpack args) or context
 
-        context._Throttles or= {}
-        context._Throttles[id] or= {
-            budget: budget
-            lastUse: 0
-        }
+        throttles = context._Throttles
+        if not throttles
+            context._Throttles = {}
+            throttles = context._Throttles
+
+        throttle = rawget throttles, id
+        if not throttle
+            newThrottle = {
+                budget: budget
+                lastUse: 0
+            }
+            throttle = newThrottle
+            rawset throttles, id, newThrottle
 
         now = CurTime!
-        throttle = context._Throttles[id]
 
         -- Refill the budget
-        sinceLastUse = now - group.lastUse
+        sinceLastUse = now - throttle.lastUse
         refillAmount = sinceLastUse * refillRate
-        throttle.budget = min throttle.budget + refillAmount, budget
+        -- throttle.budget = min(throttle.budget + refillAmount, budget)
+        rawset(throttle, "budget", min(rawget(throttle, "budget") + refillAmount, budget))
 
         -- Has budget, can use
-        if throttle.budget >= 1
-            throttle.budget -= 1
-            throttle.lastUse = now
+        throttleBudget = rawget(throttle, "budget")
+        if throttleBudget >= 1
+            -- throttle.budget -= 1
+            rawset throttle, "budget", throttleBudget - 1
+            rawset throttle, "lastUse", now
             return succeed!
 
         -- Blocked by delay
         return fail! if sinceLastUse < delay
 
         -- No budget, but has waited long enough since the last use
-        throttle.lastUse = now
+        rawset throttle, "lastUse", now
         return succeed!
+
+    Throttler.throttles[baseId] = { :func, :throttledFunc, :throttleStruct }
+
+    return throttledFunc
