@@ -49,3 +49,15 @@ MyLib = {
 local throttle = Throttler:create( MyLib.spammyFunction, struct )
 MyLib.spammyFunction = throttle
 ```
+
+## The Throttle Structure
+| Param            | Type                        | Description                                                                                                      | Default                            |
+|------------------|-----------------------------|------------------------------------------------------------------------------------------------------------------|------------------------------------|
+| **`id`**         | `string`                    | An identifier for this throttle (must be unique per `context`)                                                   | `throttler_limit_#`                |
+| **`context`**    | `table`/`entity`/`function` | Where to store the throttle data (Accepts a function that returns a context object)                                                          | Function returning the first param |
+| **`delay`**      | `float`                     | How long to wait between executions after the budget is expended                                                 | `1`                                |
+| **`refillRate`** | `float`                     | How much budget to refill per second                                                                             | `1`                                |
+| **`success`**    | `function`                  | A callback to run when the execution succeeds (before calling the throttled func)                                | `noop`                             |
+| **`failure`**    | `function`                  | A callback to run when the execution is prevented                                                                | `noop`                             |
+| **`shouldSkip`** | `function`                  | Function used to decide if throttling logic should be applied for this execution (return true to skip)           | `noop`                             |
+| **`adjust`**     | `function`                  | Return a table with any of: [`delay`,`budget`,`refillRate`,`id`] to override initial settings for this execution | `noop`                             |
