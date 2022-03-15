@@ -19,7 +19,7 @@ Assuming you can get the project cloned (some hosting interfaces may not support
 
 ## Usage
 There are some comprehensive examples in the [examples folder](https://github.com/CFC-Servers/gm_throttle/tree/main/example), but a very simple usage example follows:
-
+( Read more about the Throttle Struct [below](https://github.com/CFC-Servers/gm_throttle/blob/main/README.md#the-throttle-structure) )
 ```lua
 require( "throttler" )
 
