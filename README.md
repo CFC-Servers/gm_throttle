@@ -18,7 +18,7 @@ git clone --single-branch --branch lua git@github.com:CFC-Servers/gm_throttle.gi
 Assuming you can get the project cloned (some hosting interfaces may not support this), any auto-updater software should work just fine.
 
 ## Usage
-There are some comprehensive examples in the [examples folder](https://github.com/CFC-Servers/gm_throttle/tree/main/example), but the general idea:
+There are some comprehensive examples in the [examples folder](https://github.com/CFC-Servers/gm_throttle/tree/main/example), but a very simple usage example follows:
 
 ```lua
 require( "throttler" )
@@ -27,7 +27,7 @@ require( "throttler" )
 
 -- You can build a generic pre-filled structure and overwrite specific values:
 local throttleStruct = Throttler:build()
-throttleStruct.delay = 0.5
+throttleStruct.delay = 0.5 -- In seconds
 throttleStruct.budget = 500
 
 throttleStruct.failure = function( ent )
@@ -38,21 +38,15 @@ throttleStruct.shouldSkip = function( ent )
     if ent.Owner:IsAdmin() then return true end
 end
 
--- (You can allso make your own Throttle Struct, but you'll need to give it all of the values)
-
-
--- Once you have your Throttle Struct, you can use it to build a throttle:
-MyLib = {}
-MyLib.spammyFunction = function( ent )
-    local data = ent:GetExpensiveThing()
-    performExpensiveCalculation( data )
-end
-
-local throttle = Throttler:build( MyLib.spammyFunction, throttleStruct )
+-- Once you have your Throttle Struct, you can use it to stub a function:
+MyLib = {
+    spammyFunction = function( ent )
+        local data = ent:GetExpensiveThing()
+        performExpensiveCalculation( data )
+    end
+}
 
 -- The final step is to replace the desired function with your new throttle:
+local throttle = Throttler:create( MyLib.spammyFunction, throttleStruct )
 MyLib.spammyFunction = throttle
-
--- Or more succinctly:
-MyLib.spammyFunction = Throttler:build( MyLib.spammyFunction, throttleStruct )
 ```
