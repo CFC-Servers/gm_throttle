@@ -18,8 +18,7 @@ There are some comprehensive examples in the [examples folder](https://github.co
 ```lua
 require( "throttler" )
 
--- The first step is to create a Throttler struct.
-
+-- The first step is to create a Throttler struct
 -- You can build a generic pre-filled structure and overwrite specific values:
 local struct = Throttler:build()
 struct.delay = 0.5 -- In seconds
