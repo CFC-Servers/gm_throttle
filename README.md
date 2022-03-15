@@ -2,23 +2,18 @@
 A library for Garry's Mod that allows simple, dynamic, and feature-rich rate limiting of functions
 
 ## Installation
-Simply download a copy of the zip, or clone the repository straight into your addons folder!
+**Simple**
+ - You can download the latest release .zip from the [Releases](https://github.com/CFC-Servers/gm_throttle/releases) tab. Extract that and place it in your `addons` directory.
 
-### Download
-The latest pre-compiled versions are available in **[Releases](https://github.com/CFC-Servers/gm_throttle/releases/)**
-
-### Git Clone
-Because this project uses Moonscript, keeping it updated via `git` is _slightly_ more involved.
-
-The [`lua` branch](https://github.com/CFC-Servers/gm_throttle/tree/lua) is a lua-only branch containing the compiled code from the most recent release. You can use this branch to keep `gm_throttle` up to date.
-```sh
-git clone --single-branch --branch lua git@github.com:CFC-Servers/gm_throttle.git
-```
+**Source Controlled**
+ - You can clone this repository directly into your `addons` directory, but be sure to check out the [`lua`](https://github.com/CFC-Servers/gm_throttle/tree/lua) branch which contains the compiled Lua from the latest release.
+ - e.g. ``` git clone --single-branch --branch lua git@github.com:CFC-Servers/gm_throttle.git ```
 
 Assuming you can get the project cloned (some hosting interfaces may not support this), any auto-updater software should work just fine.
 
 ## Usage
 There are some comprehensive examples in the [examples folder](https://github.com/CFC-Servers/gm_throttle/tree/main/example), but a very simple usage example follows:
+
 ( Read more about the Throttle Struct [below](https://github.com/CFC-Servers/gm_throttle/blob/main/README.md#the-throttle-structure) )
 ```lua
 require( "throttler" )
