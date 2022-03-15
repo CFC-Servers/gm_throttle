@@ -26,15 +26,15 @@ require( "throttler" )
 -- The first step is to create a Throttler struct.
 
 -- You can build a generic pre-filled structure and overwrite specific values:
-local throttleStruct = Throttler:build()
-throttleStruct.delay = 0.5 -- In seconds
-throttleStruct.budget = 500
+local struct = Throttler:build()
+struct.delay = 0.5 -- In seconds
+struct.budget = 500
 
-throttleStruct.failure = function( ent )
+struct.failure = function( ent )
     ent.Owner:ChatPrint( "The thing was throttled!" )
 end
 
-throttleStruct.shouldSkip = function( ent )
+struct.shouldSkip = function( ent )
     if ent.Owner:IsAdmin() then return true end
 end
 
@@ -46,7 +46,6 @@ MyLib = {
     end
 }
 
--- The final step is to replace the desired function with your new throttle:
-local throttle = Throttler:create( MyLib.spammyFunction, throttleStruct )
+local throttle = Throttler:create( MyLib.spammyFunction, struct )
 MyLib.spammyFunction = throttle
 ```
