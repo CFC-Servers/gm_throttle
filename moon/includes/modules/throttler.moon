@@ -110,18 +110,20 @@ Throttler.create = (func, throttleStruct={}) =>
         -- Refill the budget
         sinceLastUse = now - throttle.lastUse
         refillAmount = sinceLastUse * refillRate
-        -- throttle.budget = min(throttle.budget + refillAmount, budget)
-        rawset(throttle, "budget", min(rawget(throttle, "budget") + refillAmount, budget))
+
+        currentBudget = rawget throttle, "budget"
+        newBudget = currentBudget + refillAmount
+        newBudget = min newBudget, budget
 
         -- Has budget, can use
-        throttleBudget = rawget(throttle, "budget")
-        if throttleBudget >= 1
+        if newBudget >= 1
             -- throttle.budget -= 1
-            rawset throttle, "budget", throttleBudget - 1
+            rawset throttle, "budget", newBudget - 1
             rawset throttle, "lastUse", now
             return succeed!
 
         -- Blocked by delay
+        rawset throttle, "budget", newBudget
         return fail! if sinceLastUse < delay
 
         -- No budget, but has waited long enough since the last use
