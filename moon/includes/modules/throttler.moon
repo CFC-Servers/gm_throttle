@@ -19,8 +19,6 @@ Throttler._getId = =>
 --     Where to store the throttles (table, entity, etc.)
 --       - Accepts a function if you need to figure it out yourself each call
 --
---   delay
---     How long between executions
 --
 --   budget
 --     How many times it can be called before being delayed
@@ -38,13 +36,12 @@ Throttler._getId = =>
 --     Function to decide if throttling logic should be skipped (return true to skip)
 --
 --   adjust
---     Function, return a table with any of the following keys: ["delay", "budget", "refillRate", "id"] to override the initial settings for this execution
+--     Function, return a table with any of the following keys: [ "budget", "refillRate", "id"] to override the initial settings for this execution
 
 Throttler.build = () =>
     {
         id: @_getId!
         context: @_getself
-        delay: 1
         budget: 1
         refillRate: 1
         success: @_noop
@@ -57,7 +54,7 @@ Throttler.build = () =>
 Throttler.throttles = {}
 Throttler.create = (func, throttleStruct={}) =>
     {
-        :id, :context, :delay, :budget, :refillRate,
+        :id, :context, :budget, :refillRate,
         :success, :failure, :shouldSkip, :adjust
     } = Merge @build!, throttleStruct
 
@@ -84,7 +81,6 @@ Throttler.create = (func, throttleStruct={}) =>
             adjustmentId and= adjustmentId(baseId)
 
             id = adjustmentId if adjustmentId
-            delay = rawget(adjustments, "delay") or delay
             budget = rawget(adjustments, "budget") or budget
             refillRate = rawget(adjustments, "refillRate") or refillRate
 
@@ -115,20 +111,13 @@ Throttler.create = (func, throttleStruct={}) =>
         newBudget = currentBudget + refillAmount
         newBudget = min newBudget, budget
 
-        -- Has budget, can use
-        if newBudget >= 1
-            -- throttle.budget -= 1
-            rawset throttle, "budget", newBudget - 1
-            rawset throttle, "lastUse", now
-            return succeed!
+        return fail! if newBudget < 1
 
-        -- Blocked by delay
-        rawset throttle, "budget", newBudget
-        return fail! if sinceLastUse < delay
-
-        -- No budget, but has waited long enough since the last use
+        rawset throttle, "budget", newBudget - 1
         rawset throttle, "lastUse", now
+
         return succeed!
+
 
     Throttler.throttles[baseId] = { :func, :throttledFunc, :throttleStruct }
 
