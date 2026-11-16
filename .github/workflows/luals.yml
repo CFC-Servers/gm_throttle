@@ -1,0 +1,8 @@
+name: LuaLS
+
+on:
+  pull_request:
+
+jobs:
+  luals:
+    uses: CFC-Servers/gmod_luals_workflow/.github/workflows/luals.yml@main

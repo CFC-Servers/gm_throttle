@@ -39,12 +39,12 @@ local function throttleHoloScale()
         end
     end
 
-    throttle.shouldSkip = function(chip)
+    throttle.shouldSkip = function( chip )
         if chip.player:IsAdmin() then
             return true
         end
     end
 
-    wire_expression2_funcs[signature][3] = Throttler.create( holoScale, throttle )
+    wire_expression2_funcs[signature][3] = Throttler:create( holoScale, throttle )
 end
 

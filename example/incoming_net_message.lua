@@ -13,12 +13,12 @@ local function throttleWireFriendslist()
     throttle.refillRate = 10
 
     -- Store the throttle data on the player
-    throttle.context = function( ply )
+    throttle.context = function( _, ply )
         return ply
     end
 
-    throttle.failure = function( ply )
-        local count = ply.throttleCount
+    throttle.failure = function( _, ply )
+        local count = ply.throttleCount or 0
 
         if count > 50 then
             ply:Kick( "Net message spam" )
@@ -28,8 +28,8 @@ local function throttleWireFriendslist()
     end
 
     -- You could subtract from their throttleCount every time they succesfully send a message
-    throttle.success = function( ply )
-        local count = ply.throttleCount
+    throttle.success = function( _, ply )
+        local count = ply.throttleCount or 0
         if count == 0 then return end
 
         ply.throttleCount = count - 1
@@ -41,5 +41,5 @@ local function throttleWireFriendslist()
         end
     end
 
-    net.Receivers["wire_friendslist"] = Throttler.create( receiver, throttle )
+    net.Receivers["wire_friendslist"] = Throttler:create( receiver, throttle )
 end
