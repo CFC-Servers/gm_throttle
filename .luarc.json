@@ -1,0 +1,3 @@
+{
+    "diagnostics.globals": [ "expect", "stub", "wire_expression2_funcs" ]
+}

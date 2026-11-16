@@ -41,12 +41,13 @@ local function throttleEmitSound()
             return true
         end
 
-        if string.StartWith( soundPath, "ambient/" ) then
+        if string.StartsWith( soundPath, "ambient/" ) then
             return true
         end
     end
 
     local entityMeta = FindMetaTable( "Entity" )
+    ---@cast entityMeta -nil
     entityMeta._EmitSound = entityMeta._EmitSound or entityMeta.EmitSound
-    entityMeta.EmitSound = Throttler.create( entityMeta._EmitSound, throttle )
+    entityMeta.EmitSound = Throttler:create( entityMeta._EmitSound, throttle )
 end

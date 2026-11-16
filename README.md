@@ -3,11 +3,11 @@ A library for Garry's Mod that allows simple, dynamic, and feature-rich rate lim
 
 ## Installation
 **Simple**
- - You can download the latest release .zip from the [Releases](https://github.com/CFC-Servers/gm_throttle/releases) tab. Extract that and place it in your `addons` directory.
+ - You can download the [latest .zip](https://github.com/CFC-Servers/gm_throttle/archive/refs/heads/main.zip) of the `main` branch. Extract that and place it in your `addons` directory.
 
 **Source Controlled**
- - You can clone this repository directly into your `addons` directory, but be sure to check out the [`lua`](https://github.com/CFC-Servers/gm_throttle/tree/lua) branch which contains the compiled Lua from the latest release.
- - e.g. ``` git clone --single-branch --branch lua git@github.com:CFC-Servers/gm_throttle.git ```
+ - You can clone this repository directly into your `addons` directory.
+ - e.g. ``` git clone git@github.com:CFC-Servers/gm_throttle.git ```
 
 Assuming you can get the project cloned (some hosting interfaces may not support this), any auto-updater software should work just fine.
 
@@ -50,8 +50,9 @@ MyLib.spammyFunction = throttle
 | **`id`**         | `string`                    | An identifier for this throttle (must be unique per `context`)                                                   | `throttler_limit_#`                |
 | **`context`**    | `table`/`entity`/`function` | Where to store the throttle data (Accepts a function that returns a context object)                                                          | Function returning the first param |
 | **`delay`**      | `float`                     | How long to wait between executions after the budget is expended                                                 | `1`                                |
+| **`budget`**     | `float`                     | How many executions are allowed before the delay applies                                                         | `1`                                |
 | **`refillRate`** | `float`                     | How much budget to refill per second                                                                             | `1`                                |
 | **`success`**    | `function`                  | A callback to run when the execution succeeds (before calling the throttled func)                                | `noop`                             |
 | **`failure`**    | `function`                  | A callback to run when the execution is prevented                                                                | `noop`                             |
 | **`shouldSkip`** | `function`                  | Function used to decide if throttling logic should be applied for this execution (return true to skip)           | `noop`                             |
-| **`adjust`**     | `function`                  | Return a table with any of: [`delay`,`budget`,`refillRate`,`id`] to override initial settings for this execution | `noop`                             |
+| **`adjust`**     | `function`                  | Return a table with any of: [`delay`,`budget`,`refillRate`,`id`] to override initial settings for this execution | `nil`                              |
